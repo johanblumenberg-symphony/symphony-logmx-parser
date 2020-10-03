@@ -1,5 +1,6 @@
 package com.symphony.logmxparser;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -8,6 +9,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.lightysoft.logmx.business.ParsedEntry;
 import com.lightysoft.logmx.mgr.LogFileParser;
 
@@ -16,6 +22,7 @@ public class ManaParser extends LogFileParser {
 	private StringBuilder entryMsgBuffer = null;
 
 	private SimpleDateFormat dateFormat = null;
+	private static ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
 	private final static Pattern ENTRY_BEGIN_PATTERN = Pattern
 			.compile("^(\\d*)\\|(.*)\\|(.*)\\(\\d*\\)\\|([^:]*): (.*)$");
@@ -23,6 +30,12 @@ public class ManaParser extends LogFileParser {
 	private static final String EXTRA_SEQ_FIELD_KEY = "seq";
 	private static final List<String> EXTRA_FIELDS_KEYS = Arrays.asList(EXTRA_SEQ_FIELD_KEY);
 
+	public ManaParser() {
+		DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+		prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+		jsonMapper.setDefaultPrettyPrinter(prettyPrinter);
+	}
+	
 	@Override
 	public String getParserName() {
 		return "Symphony Client 2.0 log file parser";
@@ -76,6 +89,33 @@ public class ManaParser extends LogFileParser {
 		}
 	}
 
+	@Override
+	public String getEntryStringRepresentation(ParsedEntry entry) {
+		String message = entry.getMessage();
+		
+		for (int i = message.indexOf(','); i >= 0; i = message.indexOf(',', i + 1)) {
+			try {
+				List<Object> parsed = jsonMapper.readValue("[" + message.substring(i + 1) + "]", List.class);
+				
+				StringBuilder result = new StringBuilder();
+				result.append(message.substring(0, i));
+				for (Object arg : parsed) {
+					result.append('\n');
+					result.append(jsonMapper.writeValueAsString(arg));
+					result.append(',');
+				}
+				return result.toString();
+			} catch (JsonParseException e) {
+				// try next
+			} catch (IOException e) {
+				// failed
+				break;
+			}
+		}
+		
+		return message;
+	}
+	
 	private void recordPreviousEntryIfExists() throws Exception {
 		if (entry != null) {
 			entry.setMessage(entryMsgBuffer.toString());
