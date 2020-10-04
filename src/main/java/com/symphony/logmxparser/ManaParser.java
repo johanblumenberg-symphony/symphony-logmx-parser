@@ -82,7 +82,7 @@ public class ManaParser extends LogFileParser {
 	@Override
 	public Date getAbsoluteEntryDate(ParsedEntry pEntry) throws Exception {
 		if (dateFormat == null) {
-			dateFormat = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SSSZ", getLocale());
+			dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", getLocale());
 		}
 		synchronized (dateFormat) {
 			return dateFormat.parse(pEntry.getDate());
