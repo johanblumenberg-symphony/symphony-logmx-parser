@@ -18,14 +18,17 @@ import com.lightysoft.logmx.business.ParsedEntry;
 import com.lightysoft.logmx.mgr.LogFileParser;
 
 public class ManaParser extends LogFileParser {
-	private ParsedEntry entry = null;
-	private StringBuilder entryMsgBuffer = null;
+	protected ParsedEntry entry = null;
+	protected StringBuilder entryMsgBuffer = null;
 
 	private SimpleDateFormat dateFormat = null;
 	private static ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-	private final static Pattern ENTRY_BEGIN_PATTERN = Pattern
+	private final static Pattern ENTRY1_BEGIN_PATTERN = Pattern
 			.compile("^(\\d*)\\|(.*)\\|(.*)\\(\\d*\\)\\|([^:]*): (.*)$");
+	private final static Pattern ENTRY2_BEGIN_PATTERN = Pattern
+			.compile("^(.*)\\s*\\|\\s*(.*)\\(\\d*\\)\\s*\\|\\s*(.*)\\s*\\|\\s*(.*)$");
+
 
 	private static final String EXTRA_SEQ_FIELD_KEY = "seq";
 	private static final List<String> EXTRA_FIELDS_KEYS = Arrays.asList(EXTRA_SEQ_FIELD_KEY);
@@ -35,7 +38,7 @@ public class ManaParser extends LogFileParser {
 		prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
 		jsonMapper.setDefaultPrettyPrinter(prettyPrinter);
 	}
-	
+
 	@Override
 	public String getParserName() {
 		return "Symphony Client 2.0 log file parser";
@@ -46,6 +49,38 @@ public class ManaParser extends LogFileParser {
 		return "Symphony Client 2.0 log files";
 	}
 
+	protected boolean parseEntry(String line) throws Exception {
+		Matcher matcher1 = ENTRY1_BEGIN_PATTERN.matcher(line);
+		Matcher matcher2 = ENTRY2_BEGIN_PATTERN.matcher(line);
+
+		if (matcher1.matches()) {
+			prepareNewEntry();
+
+			Integer seq = Integer.parseInt(matcher1.group(1));
+			entry.getUserDefinedFields().put(EXTRA_SEQ_FIELD_KEY, seq);
+			entry.setDate(matcher1.group(2));
+			entry.setLevel(matcher1.group(3));
+			entry.setEmitter(matcher1.group(4));
+
+			entryMsgBuffer.append(matcher1.group(5));
+
+			return true;
+		} else if (matcher2.matches()) {
+			prepareNewEntry();
+
+			entry.setDate(matcher2.group(1));
+			entry.setLevel(matcher2.group(2));
+			entry.setEmitter(matcher2.group(3));
+
+			entryMsgBuffer.append(matcher2.group(4));
+
+			return true;
+			
+		} else {
+			return false;
+		}
+	}
+
 	@Override
 	protected void parseLine(String line) throws Exception {
 		if (line == null) {
@@ -53,19 +88,10 @@ public class ManaParser extends LogFileParser {
 			return;
 		}
 
-		Matcher matcher = ENTRY_BEGIN_PATTERN.matcher(line);
-		if (matcher.matches()) {
-			prepareNewEntry();
-
-			Integer seq = Integer.parseInt(matcher.group(1));
-			entry.getUserDefinedFields().put(EXTRA_SEQ_FIELD_KEY, seq);
-			entry.setDate(matcher.group(2));
-			entry.setLevel(matcher.group(3));
-			entry.setEmitter(matcher.group(4));
-
-			entryMsgBuffer.append(matcher.group(5));
-		} else if (entry != null) {
-			entryMsgBuffer.append('\n').append(line);
+		if (!parseEntry(line)) {
+			if (entry != null) {
+				entryMsgBuffer.append('\n').append(line);
+			}
 		}
 	}
 
@@ -92,11 +118,11 @@ public class ManaParser extends LogFileParser {
 	@Override
 	public String getEntryStringRepresentation(ParsedEntry entry) {
 		String message = entry.getMessage();
-		
+
 		for (int i = message.indexOf(','); i >= 0; i = message.indexOf(',', i + 1)) {
 			try {
 				List<Object> parsed = jsonMapper.readValue("[" + message.substring(i + 1) + "]", List.class);
-				
+
 				StringBuilder result = new StringBuilder();
 				result.append(message.substring(0, i));
 				for (Object arg : parsed) {
@@ -112,11 +138,11 @@ public class ManaParser extends LogFileParser {
 				break;
 			}
 		}
-		
+
 		return message;
 	}
-	
-	private void recordPreviousEntryIfExists() throws Exception {
+
+	protected void recordPreviousEntryIfExists() throws Exception {
 		if (entry != null) {
 			entry.setMessage(entryMsgBuffer.toString());
 			addEntry(entry);
@@ -124,7 +150,7 @@ public class ManaParser extends LogFileParser {
 		}
 	}
 
-	private void prepareNewEntry() throws Exception {
+	protected void prepareNewEntry() throws Exception {
 		recordPreviousEntryIfExists();
 		entry = createNewEntry();
 		entryMsgBuffer = new StringBuilder(80);
