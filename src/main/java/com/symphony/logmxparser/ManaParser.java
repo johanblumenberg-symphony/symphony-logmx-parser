@@ -29,8 +29,8 @@ public class ManaParser extends LogFileParser {
 	private final static Pattern ENTRY2_BEGIN_PATTERN = Pattern
 			.compile("^(.*)\\s*\\|\\s*(.*)\\(\\d*\\)\\s*\\|\\s*(.*)\\s*\\|\\s*(.*)$");
 
-
 	private static final String EXTRA_SEQ_FIELD_KEY = "seq";
+	private static final String EXTRA_HIDDEN_ORG_FIELD_KEY = "org";
 	private static final List<String> EXTRA_FIELDS_KEYS = Arrays.asList(EXTRA_SEQ_FIELD_KEY);
 
 	public ManaParser() {
@@ -61,6 +61,7 @@ public class ManaParser extends LogFileParser {
 			entry.setDate(matcher1.group(2));
 			entry.setLevel(matcher1.group(3));
 			entry.setEmitter(matcher1.group(4));
+			entry.getUserDefinedFields().put(EXTRA_HIDDEN_ORG_FIELD_KEY, line);
 
 			entryMsgBuffer.append(matcher1.group(5));
 
@@ -71,11 +72,12 @@ public class ManaParser extends LogFileParser {
 			entry.setDate(matcher2.group(1));
 			entry.setLevel(matcher2.group(2));
 			entry.setEmitter(matcher2.group(3));
+			entry.getUserDefinedFields().put(EXTRA_HIDDEN_ORG_FIELD_KEY, line);
 
 			entryMsgBuffer.append(matcher2.group(4));
 
 			return true;
-			
+
 		} else {
 			return false;
 		}
@@ -124,11 +126,13 @@ public class ManaParser extends LogFileParser {
 				List<Object> parsed = jsonMapper.readValue("[" + message.substring(i + 1) + "]", List.class);
 
 				StringBuilder result = new StringBuilder();
+
+				result.append(entry.getUserDefinedFields().get(EXTRA_HIDDEN_ORG_FIELD_KEY)).append("\n\n");
+
 				result.append(message.substring(0, i));
 				for (Object arg : parsed) {
 					result.append('\n');
 					result.append(jsonMapper.writeValueAsString(arg));
-					result.append(',');
 				}
 				return result.toString();
 			} catch (JsonParseException e) {
@@ -139,7 +143,10 @@ public class ManaParser extends LogFileParser {
 			}
 		}
 
-		return message;
+		StringBuilder result = new StringBuilder();
+		result.append(entry.getUserDefinedFields().get(EXTRA_HIDDEN_ORG_FIELD_KEY)).append("\n\n");
+		result.append(message);
+		return result.toString();
 	}
 
 	protected void recordPreviousEntryIfExists() throws Exception {
