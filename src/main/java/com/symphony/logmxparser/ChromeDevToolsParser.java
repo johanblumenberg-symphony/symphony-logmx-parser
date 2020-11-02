@@ -75,7 +75,7 @@ public class ChromeDevToolsParser extends LogFileParser {
 				entry.setEmitter("CONSOLE");
 			}
 			entryMsgBuffer.append(line);
-		} else {
+		} else if (entryMsgBuffer != null) {
 			entryMsgBuffer.append('\n').append(line);
 		}
 	}
