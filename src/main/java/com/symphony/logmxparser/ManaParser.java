@@ -49,6 +49,10 @@ public class ManaParser extends LogFileParser {
 		return "Symphony Client 2.0 log files";
 	}
 
+	protected boolean isManaLog(ParsedEntry entry) {
+		return entry.getUserDefinedFields().get(EXTRA_HIDDEN_ORG_FIELD_KEY) != null;
+	}
+	
 	protected boolean parseEntry(String line) throws Exception {
 		Matcher matcher1 = ENTRY1_BEGIN_PATTERN.matcher(line);
 		Matcher matcher2 = ENTRY2_BEGIN_PATTERN.matcher(line);
@@ -135,11 +139,8 @@ public class ManaParser extends LogFileParser {
 					result.append(jsonMapper.writeValueAsString(arg));
 				}
 				return result.toString();
-			} catch (JsonParseException e) {
-				// try next
 			} catch (IOException e) {
-				// failed
-				break;
+				// try next
 			}
 		}
 

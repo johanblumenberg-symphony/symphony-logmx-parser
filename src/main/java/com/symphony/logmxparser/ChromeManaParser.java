@@ -30,8 +30,11 @@ public class ChromeManaParser extends ManaParser {
 
 		Matcher matcher = LOG_PATTERN.matcher(line);
 		if (matcher.matches()) {
-			if ("CONSOLE".equals(matcher.group(3))) {
-				Matcher msg = MSG_PATTERN.matcher(matcher.group(4));
+			String emitter = matcher.group(3);
+			String message = matcher.group(4);
+
+			if ("CONSOLE".equals(emitter)) {
+				Matcher msg = MSG_PATTERN.matcher(message);
 
 				if (msg.matches()) {
 					if (!parseEntry(msg.group(1))) {
@@ -39,7 +42,7 @@ public class ChromeManaParser extends ManaParser {
 
 						entry.setDate(matcher.group(1));
 						entry.setLevel(matcher.group(2));
-						entry.setEmitter(matcher.group(3));
+						entry.setEmitter(emitter);
 						
 						entryMsgBuffer.append(msg.group(1));
 					}
@@ -49,9 +52,9 @@ public class ChromeManaParser extends ManaParser {
 
 				entry.setDate(matcher.group(1));
 				entry.setLevel(matcher.group(2));
-				entry.setEmitter("chrome." + matcher.group(3));
+				entry.setEmitter("chrome." + emitter);
 				
-				entryMsgBuffer.append(matcher.group(4));
+				entryMsgBuffer.append(message);
 			}
 		} else if (entry != null) {
 			entryMsgBuffer.append('\n').append(line);
@@ -60,7 +63,7 @@ public class ChromeManaParser extends ManaParser {
 
 	@Override
 	public String getEntryStringRepresentation(ParsedEntry entry) {
-		if ("CONSOLE".equals(entry.getEmitter())) {
+		if (super.isManaLog(entry)) {
 			return super.getEntryStringRepresentation(entry);
 		} else {
 			return null;
