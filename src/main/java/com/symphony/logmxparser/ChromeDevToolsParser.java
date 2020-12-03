@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.lightysoft.logmx.business.ParsedEntry;
 import com.lightysoft.logmx.mgr.LogFileParser;
 
-public class ChromeDevToolsParser extends LogFileParser {
+public class ChromeDevToolsParser extends Parser {
 	protected ParsedEntry entry = null;
 	protected StringBuilder entryMsgBuffer = null;
 
@@ -155,7 +155,7 @@ public class ChromeDevToolsParser extends LogFileParser {
 				}
 			}
 
-			addEntry(entry);
+			super.prepareEntry(entry);
 			entry = null;
 		}
 	}

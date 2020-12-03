@@ -17,21 +17,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.lightysoft.logmx.business.ParsedEntry;
 import com.lightysoft.logmx.mgr.LogFileParser;
 
-public class ManaParser extends LogFileParser {
-	protected ParsedEntry entry = null;
-	protected StringBuilder entryMsgBuffer = null;
-
+public class ManaParser extends Parser {
 	private SimpleDateFormat dateFormat = null;
 	private static ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-	private final static Pattern ENTRY1_BEGIN_PATTERN = Pattern
-			.compile("^(\\d*)\\|(.*)\\|(.*)\\(\\d*\\)\\|([^:]*): (.*)$");
-	private final static Pattern ENTRY2_BEGIN_PATTERN = Pattern
-			.compile("^(.*)\\s*\\|\\s*(.*)\\(\\d*\\)\\s*\\|\\s*(.*)\\s*\\|\\s*(.*)$");
-
-	private static final String EXTRA_SEQ_FIELD_KEY = "seq";
-	private static final String EXTRA_HIDDEN_ORG_FIELD_KEY = "org";
-	private static final List<String> EXTRA_FIELDS_KEYS = Arrays.asList(EXTRA_SEQ_FIELD_KEY);
+	private final static Pattern CLIENT20_BEGIN_PATTERN = Pattern
+			.compile("^(\\d*)\\|(.*)\\|(.*)\\(\\d*\\)\\|([^:]*): (.*)$", Pattern.DOTALL);
+	private final static Pattern CLIENT15_BEGIN_PATTERN = Pattern
+			.compile("^([^\\s]*)\\s*\\|\\s*([^\\s]*)\\(\\d*\\)\\s*\\|\\s*([^\\s]*)\\s*\\|\\s*(.*)$", Pattern.DOTALL);
 
 	public ManaParser() {
 		DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
@@ -50,12 +43,12 @@ public class ManaParser extends LogFileParser {
 	}
 
 	protected boolean isManaLog(ParsedEntry entry) {
-		return entry.getUserDefinedFields().get(EXTRA_HIDDEN_ORG_FIELD_KEY) != null;
+		return entry.getUserDefinedFields().get(EXTRA_SEQ_FIELD_KEY) != null;
 	}
 	
 	protected boolean parseEntry(String line) throws Exception {
-		Matcher matcher1 = ENTRY1_BEGIN_PATTERN.matcher(line);
-		Matcher matcher2 = ENTRY2_BEGIN_PATTERN.matcher(line);
+		Matcher matcher1 = CLIENT20_BEGIN_PATTERN.matcher(line);
+		Matcher matcher2 = CLIENT15_BEGIN_PATTERN.matcher(line);
 
 		if (matcher1.matches()) {
 			prepareNewEntry();
@@ -102,11 +95,6 @@ public class ManaParser extends LogFileParser {
 	}
 
 	@Override
-	public List<String> getUserDefinedFields() {
-		return EXTRA_FIELDS_KEYS;
-	}
-
-	@Override
 	public Date getRelativeEntryDate(ParsedEntry pEntry) throws Exception {
 		return null;
 	}
@@ -148,20 +136,5 @@ public class ManaParser extends LogFileParser {
 		result.append(entry.getUserDefinedFields().get(EXTRA_HIDDEN_ORG_FIELD_KEY)).append("\n\n");
 		result.append(message);
 		return result.toString();
-	}
-
-	protected void recordPreviousEntryIfExists() throws Exception {
-		if (entry != null) {
-			entry.setMessage(entryMsgBuffer.toString());
-			addEntry(entry);
-			entry = null;
-		}
-	}
-
-	protected void prepareNewEntry() throws Exception {
-		recordPreviousEntryIfExists();
-		entry = createNewEntry();
-		entryMsgBuffer = new StringBuilder(80);
-		entry.setUserDefinedFields(new HashMap<String, Object>(1));
 	}
 }

@@ -5,20 +5,20 @@ import java.util.regex.Pattern;
 
 import com.lightysoft.logmx.business.ParsedEntry;
 
-public class ChromeManaParser extends ManaParser {
+public class ChromeParser extends ManaParser {
 	private final static Pattern LOG_PATTERN = Pattern
 			.compile("^\\[\\d+:\\d+:\\d+/(\\d+\\.\\d+):([A-Za-z0-9]+):(.*)\\(\\d+\\)\\] (.*)$");
 
-	private final static Pattern MSG_PATTERN = Pattern.compile("^\"(.*)\", source: (.*)$");
+	private final static Pattern MSG_PATTERN = Pattern.compile("^\"(.*)\", source: (.*)$", Pattern.DOTALL);
 
 	@Override
 	public String getParserName() {
-		return "Symphony Client 2.0 chrome log file parser";
+		return "Chrome log file parser";
 	}
 
 	@Override
 	public String getSupportedFileType() {
-		return "Symphony Client 2.0 chrome log files";
+		return "Chrome log files";
 	}
 
 	@Override
@@ -29,33 +29,24 @@ public class ChromeManaParser extends ManaParser {
 		}
 
 		Matcher matcher = LOG_PATTERN.matcher(line);
+
 		if (matcher.matches()) {
 			String emitter = matcher.group(3);
 			String message = matcher.group(4);
 
+			prepareNewEntry();
+
+			entry.setDate(matcher.group(1));
+			entry.setLevel(matcher.group(2));
+			entry.getUserDefinedFields().put(EXTRA_HIDDEN_ORG_FIELD_KEY, line);
+
 			if ("CONSOLE".equals(emitter)) {
-				Matcher msg = MSG_PATTERN.matcher(message);
-
-				if (msg.matches()) {
-					if (!parseEntry(msg.group(1))) {
-						prepareNewEntry();
-
-						entry.setDate(matcher.group(1));
-						entry.setLevel(matcher.group(2));
-						entry.setEmitter(emitter);
-						
-						entryMsgBuffer.append(msg.group(1));
-					}
-				}
+				entry.setEmitter(emitter);
 			} else {
-				prepareNewEntry();
-
-				entry.setDate(matcher.group(1));
-				entry.setLevel(matcher.group(2));
 				entry.setEmitter("chrome." + emitter);
-				
-				entryMsgBuffer.append(message);
 			}
+
+			entryMsgBuffer.append(message);
 		} else if (entry != null) {
 			entryMsgBuffer.append('\n').append(line);
 		}
@@ -67,6 +58,25 @@ public class ChromeManaParser extends ManaParser {
 			return super.getEntryStringRepresentation(entry);
 		} else {
 			return null;
+		}
+	}
+	
+	@Override
+	protected void prepareEntry(ParsedEntry entry) throws Exception {
+		String message = entry.getMessage();
+		Matcher matcher = MSG_PATTERN.matcher(message);
+		
+		if(matcher.matches()) {
+			message = matcher.group(1);
+			entry.setMessage(message);
+			
+			if (parseEntry(message)) {
+				recordPreviousEntryIfExists();
+			} else {
+				super.prepareEntry(entry);
+			}
+		} else {
+			super.prepareEntry(entry);
 		}
 	}
 }
