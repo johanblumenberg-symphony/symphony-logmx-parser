@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.lightysoft.logmx.business.ParsedEntry;
-import com.lightysoft.logmx.mgr.LogFileParser;
 
 public class Mana {
 	private static ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -27,16 +26,16 @@ public class Mana {
 
 	public Mana(Parser parser) {
 		this.parser = parser;
-		
+
 		DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
 		prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
 		jsonMapper.setDefaultPrettyPrinter(prettyPrinter);
 	}
 
-	protected boolean isManaLog(ParsedEntry entry) {
-		return entry.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY) != null;
+	public boolean isStartLine(String line) {
+		return CLIENT20_BEGIN_PATTERN.matcher(line).matches() || CLIENT15_BEGIN_PATTERN.matcher(line).matches();
 	}
-	
+
 	public void refineEntry(ParsedEntry entry) throws Exception {
 		String line = entry.getMessage();
 		Matcher matcher1 = CLIENT20_BEGIN_PATTERN.matcher(line);
@@ -49,7 +48,7 @@ public class Mana {
 			entry.setLevel(matcher1.group(3));
 			entry.setEmitter(matcher1.group(4));
 			entry.setMessage(matcher1.group(5));
-			
+
 			refineStringRepresentation(entry);
 		} else if (matcher2.matches()) {
 			Parser.setDate(entry, matcher2.group(1), parseDate(matcher2.group(1)));
@@ -84,10 +83,10 @@ public class Mana {
 			}
 		}
 	}
-	
+
 	private Date parseDate(String value) throws Exception {
 		if (dateFormat == null) {
-			dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", parser.getParserLocale());			
+			dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", parser.getParserLocale());
 		}
 		synchronized (dateFormat) {
 			return dateFormat.parse(value);

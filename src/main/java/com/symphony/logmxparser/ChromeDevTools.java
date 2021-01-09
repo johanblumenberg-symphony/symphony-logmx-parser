@@ -24,8 +24,12 @@ public class ChromeDevTools {
 		prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
 		jsonMapper.setDefaultPrettyPrinter(prettyPrinter);
 	}
+	
+	public boolean isStartLine(String line) {
+		return ENTRY_BEGIN_PATTERN.matcher(line).matches();
+	}
 
-	protected void refineEntry(ParsedEntry entry) throws Exception {
+	public void refineEntry(ParsedEntry entry) throws Exception {
 		Matcher matcher = ENTRY_BEGIN_PATTERN.matcher(entry.getMessage());
 
 		if (matcher.matches()) {

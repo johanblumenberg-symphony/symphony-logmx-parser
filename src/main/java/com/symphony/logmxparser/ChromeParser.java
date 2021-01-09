@@ -23,18 +23,14 @@ public class ChromeParser extends Parser {
 			if (entry != null) {
 				proceed(entry.toString());
 			}
+		} else if (chrome.isStartLine(line)) {
+			if (entry != null) {
+				proceed(entry.toString());
+			}
+			entry = new StringBuilder(line);
 		} else {
-			if (chrome.isStartLine(line)) {
-				if (entry != null) {
-					proceed(entry.toString());
-				}
-				entry = new StringBuilder(line);
-			} else {
-				if (entry == null) {
-					proceed(line);
-				} else {
-					entry.append("\n").append(line);
-				}
+			if (entry != null) {
+				entry.append("\n").append(line);
 			}
 		}
 	}

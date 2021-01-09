@@ -6,7 +6,7 @@ public class ChromeDevToolsParser extends Parser {
 	private ChromeDevTools chromeDevTools = new ChromeDevTools();
 	private Mana mana = new Mana(this);
 	protected StringBuilder entry = null;
-	
+
 	@Override
 	public String getParserName() {
 		return "Chrome DevTools log file parser";
@@ -19,20 +19,18 @@ public class ChromeDevToolsParser extends Parser {
 
 	@Override
 	protected void parseLine(String line) throws Exception {
-		if (line != null) {
-			if (entry == null) {
-				if (line.endsWith("{")) {
-					entry = new StringBuilder(line);
-				} else {
-					proceed(line);
-				}
-			} else {
+		if (line == null) {
+			if (entry != null) {
+				proceed(entry.toString());
+			}
+		} else if (chromeDevTools.isStartLine(line)) {
+			if (entry != null) {
+				proceed(entry.toString());
+			}
+			entry = new StringBuilder(line);
+		} else {
+			if (entry != null) {
 				entry.append("\n").append(line);
-				
-				if ("}".equals(line)) {
-					proceed(entry.toString());
-					entry = null;					
-				}
 			}
 		}
 	}
@@ -44,7 +42,7 @@ public class ChromeDevToolsParser extends Parser {
 
 		chromeDevTools.refineEntry(entry);
 		mana.refineEntry(entry);
-		
+
 		addParsedEntry(entry);
 	}
 }
