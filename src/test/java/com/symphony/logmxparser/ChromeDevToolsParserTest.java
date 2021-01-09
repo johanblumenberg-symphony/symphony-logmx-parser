@@ -2,6 +2,8 @@ package com.symphony.logmxparser;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +15,7 @@ public class ChromeDevToolsParserTest {
 	public void createLogParser() {
 		parser.init();
 		parser.setConsumer(entries);
+		parser.setParserLocale(Locale.US);
 	}
 
 	@Test

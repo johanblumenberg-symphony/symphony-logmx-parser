@@ -1,6 +1,7 @@
 package com.symphony.logmxparser;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -28,7 +29,7 @@ public class ChromeDevTools {
 		Matcher matcher = ENTRY_BEGIN_PATTERN.matcher(entry.getMessage());
 
 		if (matcher.matches()) {
-			entry.setDate(matcher.group(1));
+			Parser.setDate(entry, matcher.group(1), parseDate(matcher.group(1)));
 			entry.setLevel(matcher.group(2));
 			entry.setMessage(matcher.group(3));
 			String msg = matcher.group(3);
@@ -98,5 +99,9 @@ public class ChromeDevTools {
 		} catch (IOException e) {
 			return null;
 		}
+	}
+	
+	private Date parseDate(String value) {
+		return new Date(Long.parseLong(value.replace(".", "")));
 	}
 }

@@ -4,7 +4,7 @@ import com.lightysoft.logmx.business.ParsedEntry;
 
 public class ChromeParser extends Parser {
 	private Chrome chrome = new Chrome();
-	private Mana mana = new Mana();
+	private Mana mana = new Mana(this);
 	protected StringBuilder entry = null;
 
 	@Override

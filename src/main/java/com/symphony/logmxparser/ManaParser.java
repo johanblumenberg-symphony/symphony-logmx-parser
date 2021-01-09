@@ -3,7 +3,7 @@ package com.symphony.logmxparser;
 import com.lightysoft.logmx.business.ParsedEntry;
 
 public class ManaParser extends Parser {
-	private Mana mana = new Mana();
+	private Mana mana = new Mana(this);
 
 	@Override
 	public String getParserName() {
