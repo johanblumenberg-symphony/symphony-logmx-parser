@@ -2,39 +2,17 @@ package com.symphony.logmxparser;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lightysoft.logmx.business.ParsedEntry;
-
 public class ManaParserTest {
-	static class TestParser extends ManaParser {
-		private List<ParsedEntry> entries = new ArrayList<>();
-
-		public List<ParsedEntry> getEntries() {
-			return entries;
-		}
-
-		public ParsedEntry getEntry() {
-			assertEquals(1, entries.size());
-			return entries.get(0);
-		}
-
-		@Override
-		protected void localAddEntry(ParsedEntry entry) {
-			entries.add(entry);
-		}
-	}
-
-	private TestParser parser;
+	private TestEntries entries = new TestEntries();
+	private ManaParser parser = new ManaParser();
 
 	@Before
 	public void createLogParser() {
-		parser = new TestParser();
 		parser.init();
+		parser.setConsumer(entries);
 	}
 
 	@Test
@@ -42,7 +20,7 @@ public class ManaParserTest {
 		parser.parseLine("2|2020-11-19T13:00:14.153Z|SYSTEM_INFO(0)|rtc.info: hello");
 		parser.parseLine(null);
 
-		var e = parser.getEntry();
+		var e = entries.getEntry();
 		assertEquals("hello", e.getMessage());
 		assertEquals("2020-11-19T13:00:14.153Z", e.getDate());
 		assertEquals("SYSTEM_INFO", e.getLevel());
@@ -57,7 +35,7 @@ public class ManaParserTest {
 		parser.parseLine("2020-11-05T22:00:48.635Z | DEBUG(4) | rtc.info | hello");
 		parser.parseLine(null);
 
-		var e = parser.getEntry();
+		var e = entries.getEntry();
 		assertEquals("hello", e.getMessage());
 		assertEquals("2020-11-05T22:00:48.635Z", e.getDate());
 		assertEquals("DEBUG", e.getLevel());
