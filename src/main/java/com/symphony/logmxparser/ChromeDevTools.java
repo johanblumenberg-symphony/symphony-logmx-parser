@@ -58,13 +58,13 @@ public class ChromeDevTools {
 						String consoleMsg = "";
 						for (Map<String, Object> arg : args2) {
 							if ("string".equals(arg.get("type")) && arg.get("value") instanceof String) {
-								consoleMsg += arg.get("value") + " ";
+								consoleMsg += " " + arg.get("value");
 							} else {
 								break;
 							}
 						}
 						if (consoleMsg.length() > 0) {
-							entry.setMessage(consoleMsg);
+							entry.setMessage(consoleMsg.substring(1));
 						}
 					}
 				}

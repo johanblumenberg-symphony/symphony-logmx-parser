@@ -26,7 +26,6 @@ public class Chrome {
 			entry.setDate(matcher.group(1));
 			entry.setLevel(matcher.group(2));
 			entry.setMessage(message);
-			entry.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, line);
 
 			if ("CONSOLE".equals(emitter)) {
 				entry.setEmitter(emitter);

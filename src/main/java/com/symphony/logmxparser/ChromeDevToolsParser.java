@@ -4,6 +4,7 @@ import com.lightysoft.logmx.business.ParsedEntry;
 
 public class ChromeDevToolsParser extends Parser {
 	private ChromeDevTools chromeDevTools = new ChromeDevTools();
+	private Mana mana = new Mana();
 	protected StringBuilder entry = null;
 	
 	@Override
@@ -42,6 +43,7 @@ public class ChromeDevToolsParser extends Parser {
 		entry.getUserDefinedFields().put(EXTRA_HIDDEN_ORG_FIELD_KEY, line);
 
 		chromeDevTools.refineEntry(entry);
+		mana.refineEntry(entry);
 		
 		addParsedEntry(entry);
 	}

@@ -41,7 +41,6 @@ public class Mana {
 			entry.setLevel(matcher1.group(3));
 			entry.setEmitter(matcher1.group(4));
 			entry.setMessage(matcher1.group(5));
-			entry.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, line);
 			
 			refineStringRepresentation(entry);
 		} else if (matcher2.matches()) {
@@ -49,7 +48,6 @@ public class Mana {
 			entry.setLevel(matcher2.group(2));
 			entry.setEmitter(matcher2.group(3));
 			entry.setMessage(matcher2.group(4));
-			entry.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, line);
 
 			refineStringRepresentation(entry);
 		}
@@ -64,7 +62,7 @@ public class Mana {
 
 				StringBuilder result = new StringBuilder();
 
-				result.append(message).append("\n\n");
+				result.append(entry.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY)).append("\n\n");
 
 				result.append(message.substring(0, i));
 				for (Object arg : parsed) {
@@ -72,6 +70,7 @@ public class Mana {
 					result.append(jsonMapper.writeValueAsString(arg));
 				}
 				entry.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, result.toString());
+				break;
 			} catch (IOException e) {
 				// try next
 			}

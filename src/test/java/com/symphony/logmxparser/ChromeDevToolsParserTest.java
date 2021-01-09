@@ -61,4 +61,58 @@ public class ChromeDevToolsParserTest {
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
 	}
+
+	@Test
+	public void testDevToolsConsoleApiLog() throws Exception {
+		parser.parseLine("[1610104509.861][DEBUG]: DevTools WebSocket Command: Runtime.consoleAPICalled (id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {");
+		parser.parseLine("   \"args\": [ {");
+		parser.parseLine("      \"type\": \"string\",");
+		parser.parseLine("      \"value\": \"hello world\"");
+		parser.parseLine("   } ]");
+		parser.parseLine("}");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("hello world", e.getMessage());
+		assertEquals("1610104509.861", e.getDate());
+		assertEquals("DEBUG", e.getLevel());
+		assertEquals("Runtime.consoleAPICalled", e.getEmitter());
+		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
+
+	@Test
+	public void testDevToolsMana15Log() throws Exception {
+		parser.parseLine("[1610104509.861][DEBUG]: DevTools WebSocket Command: Runtime.consoleAPICalled (id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {");
+		parser.parseLine("   \"args\": [ {");
+		parser.parseLine("      \"type\": \"string\",");
+		parser.parseLine("      \"value\": \"2021-01-08T11:15:15.981Z | INFO(3) | RtcLogImpl | RtcLog initiated\"");
+		parser.parseLine("   } ]");
+		parser.parseLine("}");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("RtcLog initiated", e.getMessage());
+		assertEquals("2021-01-08T11:15:15.981Z", e.getDate());
+		assertEquals("INFO", e.getLevel());
+		assertEquals("RtcLogImpl", e.getEmitter());
+		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
+
+	@Test
+	public void testDevToolsMana20Log() throws Exception {
+		parser.parseLine("[1610104509.861][DEBUG]: DevTools WebSocket Command: Runtime.consoleAPICalled (id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {");
+		parser.parseLine("   \"args\": [ {");
+		parser.parseLine("      \"type\": \"string\",");
+		parser.parseLine("      \"value\": \"1|2021-01-08T11:15:15.981Z|INFO(3)|RtcLogImpl: RtcLog initiated\"");
+		parser.parseLine("   } ]");
+		parser.parseLine("}");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("RtcLog initiated", e.getMessage());
+		assertEquals("2021-01-08T11:15:15.981Z", e.getDate());
+		assertEquals("INFO", e.getLevel());
+		assertEquals("RtcLogImpl", e.getEmitter());
+		assertEquals(1, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
 }

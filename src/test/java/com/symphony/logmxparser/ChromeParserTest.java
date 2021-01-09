@@ -81,7 +81,7 @@ public class ChromeParserTest {
 	}
 
 	@Test
-	public void testManaLog() throws Exception {
+	public void testMana20Log() throws Exception {
 		parser.parseLine(
 				"[81:81:1203/094807.791698:INFO:CONSOLE(2)] \"1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: created\", source: https://test.com/bundle.js (2)");
 		parser.parseLine(null);
@@ -91,13 +91,29 @@ public class ChromeParserTest {
 		assertEquals("2020-12-03T09:48:07.759Z", e.getDate());
 		assertEquals("INFO", e.getLevel());
 		assertEquals("core.streamstore", e.getEmitter());
-		assertEquals("1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: created",
+		assertEquals("[81:81:1203/094807.791698:INFO:CONSOLE(2)] \"1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: created\", source: https://test.com/bundle.js (2)",
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(1, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
 	}
 
 	@Test
-	public void testMultiLineManaLog() throws Exception {
+	public void testMana15Log() throws Exception {
+		parser.parseLine(
+				"[81:81:1203/094807.791698:INFO:CONSOLE(2)] \"2020-12-03T09:48:07.759Z | INFO(3) | core.streamstore | created\", source: https://test.com/bundle.js (2)");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("created", e.getMessage());
+		assertEquals("2020-12-03T09:48:07.759Z", e.getDate());
+		assertEquals("INFO", e.getLevel());
+		assertEquals("core.streamstore", e.getEmitter());
+		assertEquals("[81:81:1203/094807.791698:INFO:CONSOLE(2)] \"2020-12-03T09:48:07.759Z | INFO(3) | core.streamstore | created\", source: https://test.com/bundle.js (2)",
+				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
+		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
+
+	@Test
+	public void testMultiLineMana20Log() throws Exception {
 		parser.parseLine(
 				"[81:81:1203/094807.791698:INFO:CONSOLE(2)] \"1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: hello");
 		parser.parseLine("world\", source: https://test.com/bundle.js (2)");
@@ -108,7 +124,7 @@ public class ChromeParserTest {
 		assertEquals("2020-12-03T09:48:07.759Z", e.getDate());
 		assertEquals("INFO", e.getLevel());
 		assertEquals("core.streamstore", e.getEmitter());
-		assertEquals("1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: hello\nworld",
+		assertEquals("[81:81:1203/094807.791698:INFO:CONSOLE(2)] \"1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: hello\nworld\", source: https://test.com/bundle.js (2)",
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(1, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
 	}
