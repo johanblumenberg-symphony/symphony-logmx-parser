@@ -32,7 +32,7 @@ public class ManaParserTest {
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(2, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
 	}
-	
+
 	@Test
 	public void testClient15Log() throws Exception {
 		parser.parseLine("2020-11-05T22:00:48.635Z | DEBUG(4) | rtc.info | hello");
@@ -58,8 +58,27 @@ public class ManaParserTest {
 		assertEquals("2020-11-19T13:00:14.153Z", e.getDate());
 		assertEquals("SYSTEM_INFO", e.getLevel());
 		assertEquals("rtc.info", e.getEmitter());
-		assertEquals("2|2020-11-19T13:00:14.153Z|SYSTEM_INFO(0)|rtc.info: hello, 1, {\"key\":\"value\"}\n\nhello\n1\n{\n  \"key\" : \"value\"\n}",
+		assertEquals(
+				"2|2020-11-19T13:00:14.153Z|SYSTEM_INFO(0)|rtc.info: hello, 1, {\"key\":\"value\"}\n\nhello\n1\n{\n  \"key\" : \"value\"\n}",
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(2, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
+
+	@Test
+	public void testStatistics() throws Exception {
+		parser.parseLine("1|2020-11-25T16:35:59.323Z|DEBUG(4)|rtc.stats-4: stats, {\"name\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
+		parser.parseLine(null);
+
+		var e = entries.getEntries().get(0);
+		assertEquals("stats, {\"name\":{\"key1\":\"value1\",\"key2\":\"value2\"}}", e.getMessage());
+		assertEquals("rtc.stats-4", e.getEmitter());
+		assertEquals("DEBUG", e.getLevel());
+		assertEquals("2020-11-25T16:35:59.323Z", e.getDate());
+
+		var s = entries.getEntries().get(1);
+		assertEquals("{\"key1\":\"value1\",\"key2\":\"value2\"}", s.getMessage());
+		assertEquals("rtc.stats-4.name", s.getEmitter());
+		assertEquals("TRACE", s.getLevel());
+		assertEquals("2020-11-25T16:35:59.323Z", s.getDate());
 	}
 }

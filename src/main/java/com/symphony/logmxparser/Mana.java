@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,11 +16,14 @@ import com.lightysoft.logmx.business.ParsedEntry;
 
 public class Mana {
 	private static ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+	private static ObjectMapper jsonMapperShort = new ObjectMapper();
 
 	private final static Pattern CLIENT20_BEGIN_PATTERN = Pattern
 			.compile("^(\\d*)\\|(.*)\\|(.*)\\(\\d*\\)\\|([^:]*): (.*)$", Pattern.DOTALL);
 	private final static Pattern CLIENT15_BEGIN_PATTERN = Pattern
 			.compile("^([^\\s]*)\\s*\\|\\s*([^\\s]*)\\(\\d*\\)\\s*\\|\\s*([^\\s]*)\\s*\\|\\s*(.*)$", Pattern.DOTALL);
+	private final static Pattern STATS_EMITTER_PATTERN = Pattern.compile("^rtc\\.stats-(\\d+)$");
+	private final static Pattern STATS_MESSAGE_PATTERN = Pattern.compile("^stats, (.*)$");
 
 	private Parser parser;
 	private SimpleDateFormat dateFormat;
@@ -90,6 +94,25 @@ public class Mana {
 		}
 		synchronized (dateFormat) {
 			return dateFormat.parse(value);
+		}
+	}
+
+	public void addStatisticsEvents(ParsedEntry entry) throws Exception {
+		var emitter = STATS_EMITTER_PATTERN.matcher(entry.getEmitter());
+		var message = STATS_MESSAGE_PATTERN.matcher(entry.getMessage());
+
+		if (emitter.matches() && message.matches()) {
+			Map<String, Object> parsed = jsonMapper.readValue(message.group(1), Map.class);
+
+			for (Map.Entry<String, Object> value : parsed.entrySet()) {
+				var e = parser.prepareNewEntryFrom(entry);
+				e.setEmitter(entry.getEmitter() + "." + value.getKey());
+				e.setLevel("TRACE");
+				e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
+				e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
+
+				parser.addParsedEntry(e);
+			}
 		}
 	}
 }

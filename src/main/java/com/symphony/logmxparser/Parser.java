@@ -69,6 +69,17 @@ public abstract class Parser extends LogFileParser {
 		return entry;
 	}
 
+	protected ParsedEntry prepareNewEntryFrom(ParsedEntry src) {
+		var entry = createNewEntry();
+		entry.setUserDefinedFields(new HashMap<String, Object>(1));
+		entry.setDate(src.getDate());
+		entry.getUserDefinedFields().putAll(src.getUserDefinedFields());
+		entry.setEmitter(src.getEmitter());
+		entry.setLevel(src.getEmitter());
+		entry.setMessage(src.getMessage());
+		return entry;
+	}
+
 	static void setDate(ParsedEntry entry, String date, Date value) {
 		entry.setDate(date);
 		entry.getUserDefinedFields().put(EXTRA_HIDDEN_DATE_FIELD_KEY, value);

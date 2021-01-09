@@ -44,5 +44,7 @@ public class ChromeDevToolsParser extends Parser {
 		mana.refineEntry(entry);
 
 		addParsedEntry(entry);
+
+		mana.addStatisticsEvents(entry);
 	}
 }

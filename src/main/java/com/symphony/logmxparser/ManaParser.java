@@ -31,5 +31,7 @@ public class ManaParser extends Parser {
 		mana.refineEntry(entry);
 
 		addParsedEntry(entry);
+
+		mana.addStatisticsEvents(entry);
 	}
 }
