@@ -49,6 +49,23 @@ public class ManaParserTest {
 	}
 
 	@Test
+	public void testMultiLineMana20Log() throws Exception {
+		parser.parseLine(
+				"1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: hello");
+		parser.parseLine("world");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("hello\nworld", e.getMessage());
+		assertEquals("2020-12-03T09:48:07.759Z", e.getDate());
+		assertEquals("INFO", e.getLevel());
+		assertEquals("core.streamstore", e.getEmitter());
+		assertEquals("1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: hello\nworld",
+				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
+		assertEquals(1, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
+
+	@Test
 	public void testJsonArgs() throws Exception {
 		parser.parseLine("2|2020-11-19T13:00:14.153Z|SYSTEM_INFO(0)|rtc.info: hello, 1, {\"key\":\"value\"}");
 		parser.parseLine(null);

@@ -20,6 +20,21 @@ public class ChromeParserTest {
 
 	@Test
 	public void testChromeLog() throws Exception {
+		parser.parseLine("[89:89:1203/094800.745154:INFO:cpu_info(53)] Available number of cores: 4");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("Available number of cores: 4", e.getMessage());
+		assertEquals("094800.745154", e.getDate());
+		assertEquals("INFO", e.getLevel());
+		assertEquals("chrome.cpu_info", e.getEmitter());
+		assertEquals("[89:89:1203/094800.745154:INFO:cpu_info(53)] Available number of cores: 4",
+				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
+		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
+
+	@Test
+	public void testChromeLogFromCcFile() throws Exception {
 		parser.parseLine("[89:89:1203/094800.745154:INFO:cpu_info.cc(53)] Available number of cores: 4");
 		parser.parseLine(null);
 
@@ -27,7 +42,7 @@ public class ChromeParserTest {
 		assertEquals("Available number of cores: 4", e.getMessage());
 		assertEquals("094800.745154", e.getDate());
 		assertEquals("INFO", e.getLevel());
-		assertEquals("chrome.cpu_info.cc", e.getEmitter());
+		assertEquals("chrome.cpu_info", e.getEmitter());
 		assertEquals("[89:89:1203/094800.745154:INFO:cpu_info.cc(53)] Available number of cores: 4",
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
@@ -43,7 +58,7 @@ public class ChromeParserTest {
 		assertEquals("hello\nworld", e.getMessage());
 		assertEquals("094800.745154", e.getDate());
 		assertEquals("INFO", e.getLevel());
-		assertEquals("chrome.cpu_info.cc", e.getEmitter());
+		assertEquals("chrome.cpu_info", e.getEmitter());
 		assertEquals("[89:89:1203/094800.745154:INFO:cpu_info.cc(53)] hello\nworld",
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));

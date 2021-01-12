@@ -116,3 +116,7 @@ public class Mana {
 		}
 	}
 }
+
+// TODO: Include orignal line in stats messages
+// TODO: Separate original message and text representation
+// TODO: Add "gone" messages to stats

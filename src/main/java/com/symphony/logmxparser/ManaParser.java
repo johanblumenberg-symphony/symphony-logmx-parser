@@ -4,6 +4,7 @@ import com.lightysoft.logmx.business.ParsedEntry;
 
 public class ManaParser extends Parser {
 	private Mana mana = new Mana(this);
+	protected StringBuilder entry = null;
 
 	@Override
 	public String getParserName() {
@@ -16,9 +17,18 @@ public class ManaParser extends Parser {
 	}
 
 	public void parseLine(String line) throws Exception {
-		if (line != null) {
-			if (mana.isStartLine(line)) {
-				proceed(line);
+		if (line == null) {
+			if (entry != null) {
+				proceed(entry.toString());
+			}
+		} else if (mana.isStartLine(line)) {
+			if (entry != null) {
+				proceed(entry.toString());
+			}
+			entry = new StringBuilder(line);
+		} else {
+			if (entry != null) {
+				entry.append("\n").append(line);
 			}
 		}
 	}

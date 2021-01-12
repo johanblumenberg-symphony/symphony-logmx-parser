@@ -36,6 +36,8 @@ public class Chrome {
 					message = matcher2.group(1);
 					entry.setMessage(message);
 				}
+			} else if (emitter.endsWith(".cc")) {
+				entry.setEmitter("chrome." + emitter.substring(0, emitter.length() - 3));
 			} else {
 				entry.setEmitter("chrome." + emitter);
 			}
