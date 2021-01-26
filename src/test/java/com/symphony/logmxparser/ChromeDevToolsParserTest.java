@@ -118,4 +118,18 @@ public class ChromeDevToolsParserTest {
 		assertEquals("RtcLogImpl", e.getEmitter());
 		assertEquals(1, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
 	}
+	
+	@Test
+	public void testCopyColumnMana20Log() throws Exception {
+		parser.parseLine("[1610104509.861][DEBUG]: DevTools WebSocket Command: Runtime.consoleAPICalled (id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {");
+		parser.parseLine("   \"args\": [ {");
+		parser.parseLine("      \"type\": \"string\",");
+		parser.parseLine("      \"value\": \"1|2021-01-08T11:15:15.981Z|INFO(3)|RtcLogImpl: RtcLog initiated\"");
+		parser.parseLine("   } ]");
+		parser.parseLine("}");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("1|2021-01-08T11:15:15.981Z|INFO(3)|RtcLogImpl: RtcLog initiated", e.getUserDefinedFields().get(Parser.EXTRA_COPY_FIELD_KEY));
+	}
 }

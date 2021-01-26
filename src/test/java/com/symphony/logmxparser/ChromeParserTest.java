@@ -146,4 +146,15 @@ public class ChromeParserTest {
 				e.getUserDefinedFields().get(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY));
 		assertEquals(1, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
 	}
+
+	@Test
+	public void testCopyColumnMana20Log() throws Exception {
+		parser.parseLine(
+				"[81:81:1203/094807.791698:INFO:CONSOLE(2)] \"1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: created\", source: https://test.com/bundle.js (2)");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("1|2020-12-03T09:48:07.759Z|INFO(3)|core.streamstore: created",
+				e.getUserDefinedFields().get(Parser.EXTRA_COPY_FIELD_KEY));
+	}
 }

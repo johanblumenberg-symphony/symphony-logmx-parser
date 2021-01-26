@@ -11,10 +11,11 @@ import com.lightysoft.logmx.mgr.LogFileParser;
 
 public abstract class Parser extends LogFileParser {
 	public static final String EXTRA_SEQ_FIELD_KEY = "seq";
+	public static final String EXTRA_COPY_FIELD_KEY = "copy";
 	public static final String EXTRA_HIDDEN_ORG_FIELD_KEY = "org";
 	private static final String EXTRA_HIDDEN_DATE_FIELD_KEY = "date";
 
-	protected static final List<String> EXTRA_FIELDS_KEYS = Arrays.asList(EXTRA_SEQ_FIELD_KEY);
+	protected static final List<String> EXTRA_FIELDS_KEYS = Arrays.asList(EXTRA_SEQ_FIELD_KEY, EXTRA_COPY_FIELD_KEY);
 
 	private EntryConsumer consumer;
 	private Locale locale;

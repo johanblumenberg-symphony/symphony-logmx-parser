@@ -98,4 +98,25 @@ public class ManaParserTest {
 		assertEquals("TRACE", s.getLevel());
 		assertEquals("2020-11-25T16:35:59.323Z", s.getDate());
 	}
+	
+	@Test
+	public void testCopyColumnMana20Log() throws Exception {
+		parser.parseLine("2|2020-11-19T13:00:14.153Z|SYSTEM_INFO(0)|rtc.info: hello, 1, {\"key\":\"value\"}");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals(
+				"2|2020-11-19T13:00:14.153Z|SYSTEM_INFO(0)|rtc.info: hello, 1, {\"key\":\"value\"}",
+				e.getUserDefinedFields().get(Parser.EXTRA_COPY_FIELD_KEY));
+	}
+
+	@Test
+	public void testCopyColumnClient15Log() throws Exception {
+		parser.parseLine("2020-11-05T22:00:48.635Z | DEBUG(4) | rtc.info | hello");
+		parser.parseLine(null);
+
+		var e = entries.getEntry();
+		assertEquals("2020-11-05T22:00:48.635Z | DEBUG(4) | rtc.info | hello",
+				e.getUserDefinedFields().get(Parser.EXTRA_COPY_FIELD_KEY));
+	}
 }

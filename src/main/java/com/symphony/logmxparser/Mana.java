@@ -52,6 +52,7 @@ public class Mana {
 			entry.setLevel(matcher1.group(3));
 			entry.setEmitter(matcher1.group(4));
 			entry.setMessage(matcher1.group(5));
+			entry.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, line);
 
 			refineStringRepresentation(entry);
 		} else if (matcher2.matches()) {
@@ -59,6 +60,7 @@ public class Mana {
 			entry.setLevel(matcher2.group(2));
 			entry.setEmitter(matcher2.group(3));
 			entry.setMessage(matcher2.group(4));
+			entry.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, line);
 
 			refineStringRepresentation(entry);
 		}
