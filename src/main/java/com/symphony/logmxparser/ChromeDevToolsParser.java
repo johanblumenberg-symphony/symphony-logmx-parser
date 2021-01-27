@@ -1,6 +1,9 @@
 package com.symphony.logmxparser;
 
 import com.lightysoft.logmx.business.ParsedEntry;
+import com.symphony.logmxparser.base.Parser;
+import com.symphony.logmxparser.format.ChromeDevTools;
+import com.symphony.logmxparser.format.Mana;
 
 public class ChromeDevToolsParser extends Parser {
 	private ChromeDevTools chromeDevTools = new ChromeDevTools();

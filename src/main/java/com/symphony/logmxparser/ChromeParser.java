@@ -1,6 +1,9 @@
 package com.symphony.logmxparser;
 
 import com.lightysoft.logmx.business.ParsedEntry;
+import com.symphony.logmxparser.base.Parser;
+import com.symphony.logmxparser.format.Chrome;
+import com.symphony.logmxparser.format.Mana;
 
 public class ChromeParser extends Parser {
 	private Chrome chrome = new Chrome();

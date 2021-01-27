@@ -1,6 +1,8 @@
 package com.symphony.logmxparser;
 
 import com.lightysoft.logmx.business.ParsedEntry;
+import com.symphony.logmxparser.base.Parser;
+import com.symphony.logmxparser.format.Mana;
 
 public class ManaParser extends Parser {
 	private Mana mana = new Mana(this);

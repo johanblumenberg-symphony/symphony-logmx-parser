@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.lightysoft.logmx.business.ParsedEntry;
+import com.symphony.logmxparser.base.Parser;
 
 public class ChromeParserTest {
 	private TestEntries entries = new TestEntries();

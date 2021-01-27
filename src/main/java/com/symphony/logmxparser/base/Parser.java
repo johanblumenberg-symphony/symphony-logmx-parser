@@ -1,4 +1,4 @@
-package com.symphony.logmxparser;
+package com.symphony.logmxparser.base;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -70,7 +70,7 @@ public abstract class Parser extends LogFileParser {
 		return entry;
 	}
 
-	protected ParsedEntry prepareNewEntryFrom(ParsedEntry src) {
+	public ParsedEntry prepareNewEntryFrom(ParsedEntry src) {
 		ParsedEntry entry = createNewEntry();
 		entry.setUserDefinedFields(new HashMap<String, Object>(1));
 		entry.setDate(src.getDate());
@@ -81,7 +81,7 @@ public abstract class Parser extends LogFileParser {
 		return entry;
 	}
 
-	static void setDate(ParsedEntry entry, String date, Date value) {
+	public static void setDate(ParsedEntry entry, String date, Date value) {
 		entry.setDate(date);
 		entry.getUserDefinedFields().put(EXTRA_HIDDEN_DATE_FIELD_KEY, value);
 	}

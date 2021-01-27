@@ -1,4 +1,4 @@
-package com.symphony.logmxparser;
+package com.symphony.logmxparser.base;
 
 import com.lightysoft.logmx.business.ParsedEntry;
 

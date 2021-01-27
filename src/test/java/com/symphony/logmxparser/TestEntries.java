@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.lightysoft.logmx.business.ParsedEntry;
+import com.symphony.logmxparser.base.EntryConsumer;
 
 public class TestEntries implements EntryConsumer {
 	private List<ParsedEntry> entries = new ArrayList<>();

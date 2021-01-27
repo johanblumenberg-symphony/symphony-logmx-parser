@@ -1,4 +1,4 @@
-package com.symphony.logmxparser;
+package com.symphony.logmxparser.format;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

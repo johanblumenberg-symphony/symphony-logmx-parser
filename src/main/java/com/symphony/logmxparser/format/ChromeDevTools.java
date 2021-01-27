@@ -1,4 +1,4 @@
-package com.symphony.logmxparser;
+package com.symphony.logmxparser.format;
 
 import java.io.IOException;
 import java.util.Date;
@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.lightysoft.logmx.business.ParsedEntry;
+import com.symphony.logmxparser.base.Parser;
 
 public class ChromeDevTools {
 	private static ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
