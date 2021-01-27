@@ -22,8 +22,10 @@ public class Mana {
 			.compile("^(\\d*)\\|(.*)\\|(.*)\\(\\d*\\)\\|([^:]*): (.*)$", Pattern.DOTALL);
 	private final static Pattern CLIENT15_BEGIN_PATTERN = Pattern
 			.compile("^([^\\s]*)\\s*\\|\\s*([^\\s]*)\\(\\d*\\)\\s*\\|\\s*([^\\s]*)\\s*\\|\\s*(.*)$", Pattern.DOTALL);
-	private final static Pattern STATS_EMITTER_PATTERN = Pattern.compile("^rtc\\.stats-(\\d+)$");
-	private final static Pattern STATS_MESSAGE_PATTERN = Pattern.compile("^stats, (.*)$");
+	private final static Pattern CLIENT20_STATS_EMITTER_PATTERN = Pattern.compile("^rtc\\.stats-(\\d+)$");
+	private final static Pattern CLIENT20_STATS_MESSAGE_PATTERN = Pattern.compile("^stats, (.*)$");
+	private final static Pattern CLIENT15_STATS_EMITTER_PATTERN = Pattern.compile("^stats-(\\d+)$");
+	private final static Pattern CLIENT15_STATS_MESSAGE_PATTERN = Pattern.compile("^stats, '\\[object Object\\]': (.*)$");
 
 	private Parser parser;
 	private SimpleDateFormat dateFormat;
@@ -100,11 +102,26 @@ public class Mana {
 	}
 
 	public void addStatisticsEvents(ParsedEntry entry) throws Exception {
-		Matcher emitter = STATS_EMITTER_PATTERN.matcher(entry.getEmitter());
-		Matcher message = STATS_MESSAGE_PATTERN.matcher(entry.getMessage());
+		Matcher emitter20 = CLIENT20_STATS_EMITTER_PATTERN.matcher(entry.getEmitter());
+		Matcher message20 = CLIENT20_STATS_MESSAGE_PATTERN.matcher(entry.getMessage());
+		Matcher emitter15 = CLIENT15_STATS_EMITTER_PATTERN.matcher(entry.getEmitter());
+		Matcher message15 = CLIENT15_STATS_MESSAGE_PATTERN.matcher(entry.getMessage());
 
-		if (emitter.matches() && message.matches()) {
-			Map<String, Object> parsed = jsonMapper.readValue(message.group(1), Map.class);
+		System.out.println("Matches " + emitter15.matches() + " " + message15.matches() + " " + entry.getMessage());
+		if (emitter20.matches() && message20.matches()) {
+			Map<String, Object> parsed = jsonMapper.readValue(message20.group(1), Map.class);
+
+			for (Map.Entry<String, Object> value : parsed.entrySet()) {
+				ParsedEntry e = parser.prepareNewEntryFrom(entry);
+				e.setEmitter(entry.getEmitter() + "." + value.getKey());
+				e.setLevel("TRACE");
+				e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
+				e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
+
+				parser.addParsedEntry(e);
+			}
+		} else if (emitter15.matches() && message15.matches()) {
+			Map<String, Object> parsed = jsonMapper.readValue(message15.group(1), Map.class);
 
 			for (Map.Entry<String, Object> value : parsed.entrySet()) {
 				ParsedEntry e = parser.prepareNewEntryFrom(entry);

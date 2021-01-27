@@ -84,7 +84,7 @@ public class ManaParserTest {
 	}
 
 	@Test
-	public void testStatistics() throws Exception {
+	public void test20Statistics() throws Exception {
 		parser.parseLine("1|2020-11-25T16:35:59.323Z|DEBUG(4)|rtc.stats-4: stats, {\"name\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
 		parser.parseLine(null);
 
@@ -101,6 +101,24 @@ public class ManaParserTest {
 		assertEquals("2020-11-25T16:35:59.323Z", s.getDate());
 	}
 	
+	@Test
+	public void test15Statistics() throws Exception {
+		parser.parseLine("2021-01-27T07:32:51.835Z | DEBUG(4) | stats-1 | stats, '[object Object]': {\"name\":{\"key1\":\"value1\",\"key2\":\"value2\"}}");
+		parser.parseLine(null);
+
+		ParsedEntry e = entries.getEntries().get(0);
+		assertEquals("stats, '[object Object]': {\"name\":{\"key1\":\"value1\",\"key2\":\"value2\"}}", e.getMessage());
+		assertEquals("stats-1", e.getEmitter());
+		assertEquals("DEBUG", e.getLevel());
+		assertEquals("2021-01-27T07:32:51.835Z", e.getDate());
+
+		ParsedEntry s = entries.getEntries().get(1);
+		assertEquals("{\"key1\":\"value1\",\"key2\":\"value2\"}", s.getMessage());
+		assertEquals("stats-1.name", s.getEmitter());
+		assertEquals("TRACE", s.getLevel());
+		assertEquals("2021-01-27T07:32:51.835Z", s.getDate());
+	}
+
 	@Test
 	public void testCopyColumnMana20Log() throws Exception {
 		parser.parseLine("2|2020-11-19T13:00:14.153Z|SYSTEM_INFO(0)|rtc.info: hello, 1, {\"key\":\"value\"}");
