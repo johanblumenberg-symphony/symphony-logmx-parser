@@ -7,6 +7,8 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.lightysoft.logmx.business.ParsedEntry;
+
 public class ChromeDevToolsParserTest {
 	private TestEntries entries = new TestEntries();
 	private ChromeDevToolsParser parser = new ChromeDevToolsParser();
@@ -23,7 +25,7 @@ public class ChromeDevToolsParserTest {
 		parser.parseLine("[1610104509.861][INFO]: Test");
 		parser.parseLine(null);
 
-		var e = entries.getEntry();
+		ParsedEntry e = entries.getEntry();
 		assertEquals("Test", e.getMessage());
 		assertEquals("1610104509.861", e.getDate());
 		assertEquals("INFO", e.getLevel());
@@ -38,7 +40,7 @@ public class ChromeDevToolsParserTest {
 		parser.parseLine("[1610104509.861][INFO]: Waiting for pending navigations...");
 		parser.parseLine(null);
 
-		var e = entries.getEntry();
+		ParsedEntry e = entries.getEntry();
 		assertEquals("Waiting for pending navigations...", e.getMessage());
 		assertEquals("1610104509.861", e.getDate());
 		assertEquals("INFO", e.getLevel());
@@ -55,7 +57,7 @@ public class ChromeDevToolsParserTest {
 		parser.parseLine("}");
 		parser.parseLine(null);
 
-		var e = entries.getEntry();
+		ParsedEntry e = entries.getEntry();
 		assertEquals("(id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {\n   \"expression\": \"1\"\n}", e.getMessage());
 		assertEquals("1610104509.861", e.getDate());
 		assertEquals("DEBUG", e.getLevel());
@@ -75,7 +77,7 @@ public class ChromeDevToolsParserTest {
 		parser.parseLine("}");
 		parser.parseLine(null);
 
-		var e = entries.getEntry();
+		ParsedEntry e = entries.getEntry();
 		assertEquals("hello world", e.getMessage());
 		assertEquals("1610104509.861", e.getDate());
 		assertEquals("DEBUG", e.getLevel());
@@ -93,7 +95,7 @@ public class ChromeDevToolsParserTest {
 		parser.parseLine("}");
 		parser.parseLine(null);
 
-		var e = entries.getEntry();
+		ParsedEntry e = entries.getEntry();
 		assertEquals("RtcLog initiated", e.getMessage());
 		assertEquals("2021-01-08T11:15:15.981Z", e.getDate());
 		assertEquals("INFO", e.getLevel());
@@ -111,7 +113,7 @@ public class ChromeDevToolsParserTest {
 		parser.parseLine("}");
 		parser.parseLine(null);
 
-		var e = entries.getEntry();
+		ParsedEntry e = entries.getEntry();
 		assertEquals("RtcLog initiated", e.getMessage());
 		assertEquals("2021-01-08T11:15:15.981Z", e.getDate());
 		assertEquals("INFO", e.getLevel());
@@ -129,7 +131,7 @@ public class ChromeDevToolsParserTest {
 		parser.parseLine("}");
 		parser.parseLine(null);
 
-		var e = entries.getEntry();
+		ParsedEntry e = entries.getEntry();
 		assertEquals("1|2021-01-08T11:15:15.981Z|INFO(3)|RtcLogImpl: RtcLog initiated", e.getUserDefinedFields().get(Parser.EXTRA_COPY_FIELD_KEY));
 	}
 }

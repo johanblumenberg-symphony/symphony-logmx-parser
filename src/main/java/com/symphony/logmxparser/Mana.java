@@ -100,14 +100,14 @@ public class Mana {
 	}
 
 	public void addStatisticsEvents(ParsedEntry entry) throws Exception {
-		var emitter = STATS_EMITTER_PATTERN.matcher(entry.getEmitter());
-		var message = STATS_MESSAGE_PATTERN.matcher(entry.getMessage());
+		Matcher emitter = STATS_EMITTER_PATTERN.matcher(entry.getEmitter());
+		Matcher message = STATS_MESSAGE_PATTERN.matcher(entry.getMessage());
 
 		if (emitter.matches() && message.matches()) {
 			Map<String, Object> parsed = jsonMapper.readValue(message.group(1), Map.class);
 
 			for (Map.Entry<String, Object> value : parsed.entrySet()) {
-				var e = parser.prepareNewEntryFrom(entry);
+				ParsedEntry e = parser.prepareNewEntryFrom(entry);
 				e.setEmitter(entry.getEmitter() + "." + value.getKey());
 				e.setLevel("TRACE");
 				e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));

@@ -65,13 +65,13 @@ public abstract class Parser extends LogFileParser {
 	}
 
 	protected ParsedEntry prepareNewEntry() {
-		var entry = createNewEntry();
+		ParsedEntry entry = createNewEntry();
 		entry.setUserDefinedFields(new HashMap<String, Object>(1));
 		return entry;
 	}
 
 	protected ParsedEntry prepareNewEntryFrom(ParsedEntry src) {
-		var entry = createNewEntry();
+		ParsedEntry entry = createNewEntry();
 		entry.setUserDefinedFields(new HashMap<String, Object>(1));
 		entry.setDate(src.getDate());
 		entry.getUserDefinedFields().putAll(src.getUserDefinedFields());

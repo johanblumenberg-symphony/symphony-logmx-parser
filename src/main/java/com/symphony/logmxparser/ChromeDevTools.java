@@ -16,15 +16,17 @@ import com.lightysoft.logmx.business.ParsedEntry;
 public class ChromeDevTools {
 	private static ObjectMapper jsonMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-	private final static Pattern ENTRY_BEGIN_PATTERN = Pattern.compile("^\\[(\\d*\\.\\d*)\\]\\[([A-Z]*)\\]: (.*)$", Pattern.DOTALL);
-	private final static Pattern DEVTOOLS_BEGIN_PATTERN = Pattern.compile("^DevTools WebSocket [^:]+: ([^ ]+) (.*)$", Pattern.DOTALL);
+	private final static Pattern ENTRY_BEGIN_PATTERN = Pattern.compile("^\\[(\\d*\\.\\d*)\\]\\[([A-Z]*)\\]: (.*)$",
+			Pattern.DOTALL);
+	private final static Pattern DEVTOOLS_BEGIN_PATTERN = Pattern.compile("^DevTools WebSocket [^:]+: ([^ ]+) (.*)$",
+			Pattern.DOTALL);
 
 	public ChromeDevTools() {
 		DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
 		prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
 		jsonMapper.setDefaultPrettyPrinter(prettyPrinter);
 	}
-	
+
 	public boolean isStartLine(String line) {
 		return ENTRY_BEGIN_PATTERN.matcher(line).matches();
 	}
@@ -50,14 +52,14 @@ public class ChromeDevTools {
 			} else {
 				entry.setEmitter("CONSOLE");
 			}
-			
+
 			String orig = entry.getMessage();
 			if ("Runtime.consoleAPICalled".equals(entry.getEmitter())) {
-				var parsed = parseArg(orig);
-				var args = parsed.get("args");
+				Map<String, Object> parsed = parseArg(orig);
+				Object args = parsed.get("args");
 
 				if (args instanceof List) {
-					var args2 = (List<Map<String, Object>>) args;
+					List<Map<String, Object>> args2 = (List<Map<String, Object>>) args;
 
 					if (!args2.isEmpty() && args2.get(0) instanceof Map) {
 						String consoleMsg = "";
@@ -74,20 +76,20 @@ public class ChromeDevTools {
 					}
 				}
 			} else if ("Log.entryAdded".equals(entry.getEmitter())) {
-				var parsed = parseArg(orig);
-				var logEntry = parsed.get("entry");
+				Map<String,Object> parsed = parseArg(orig);
+				Object logEntry = parsed.get("entry");
 
 				if (logEntry instanceof Map) {
-					var logEntry2 = (Map<String, Object>) logEntry;
+					Map<String,Object> logEntry2 = (Map<String, Object>) logEntry;
 
 					if (logEntry2.get("text") instanceof String) {
 						entry.setMessage((String) logEntry2.get("text"));
 					}
 				}
 			} else if ("Input.dispatchKeyEvent".equals(entry.getEmitter())) {
-				var parsed = parseArg(orig);
-				var type = parsed.get("type");
-				var code = parsed.get("code");
+				Map<String,Object> parsed = parseArg(orig);
+				Object type = parsed.get("type");
+				Object code = parsed.get("code");
 
 				if (type instanceof String && code instanceof String) {
 					entry.setMessage(type + " " + code);
@@ -104,7 +106,7 @@ public class ChromeDevTools {
 			return null;
 		}
 	}
-	
+
 	private Date parseDate(String value) {
 		return new Date(Long.parseLong(value.replace(".", "")));
 	}
