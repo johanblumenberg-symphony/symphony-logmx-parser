@@ -1,10 +1,12 @@
 package com.symphony.logmxparser.base;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import com.lightysoft.logmx.business.ParsedEntry;
 import com.lightysoft.logmx.mgr.LogFileParser;
@@ -19,6 +21,7 @@ public abstract class Parser extends LogFileParser {
 
 	private EntryConsumer consumer;
 	private Locale locale;
+	private static SimpleDateFormat dateFormat;
 
 	public void setConsumer(EntryConsumer consumer) {
 		this.consumer = consumer;
@@ -81,8 +84,14 @@ public abstract class Parser extends LogFileParser {
 		return entry;
 	}
 
-	public static void setDate(ParsedEntry entry, String date, Date value) {
-		entry.setDate(date);
-		entry.getUserDefinedFields().put(EXTRA_HIDDEN_DATE_FIELD_KEY, value);
+	public static void setDate(ParsedEntry entry, Date value) {
+		if (dateFormat == null) {
+			dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			dateFormat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+		}
+		synchronized (dateFormat) {
+			entry.setDate(dateFormat.format(value));
+			entry.getUserDefinedFields().put(EXTRA_HIDDEN_DATE_FIELD_KEY, value);
+		}
 	}
 }

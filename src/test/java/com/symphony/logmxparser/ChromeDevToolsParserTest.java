@@ -28,7 +28,7 @@ public class ChromeDevToolsParserTest {
 
 		ParsedEntry e = entries.getEntry();
 		assertEquals("Test", e.getMessage());
-		assertEquals("1610104509.861", e.getDate());
+		assertEquals("2021-01-08T11:15:09.861Z", e.getDate());
 		assertEquals("INFO", e.getLevel());
 		assertEquals("CONSOLE", e.getEmitter());
 		assertEquals("[1610104509.861][INFO]: Test",
@@ -43,7 +43,7 @@ public class ChromeDevToolsParserTest {
 
 		ParsedEntry e = entries.getEntry();
 		assertEquals("Waiting for pending navigations...", e.getMessage());
-		assertEquals("1610104509.861", e.getDate());
+		assertEquals("2021-01-08T11:15:09.861Z", e.getDate());
 		assertEquals("INFO", e.getLevel());
 		assertEquals("CONSOLE.navigations", e.getEmitter());
 		assertEquals("[1610104509.861][INFO]: Waiting for pending navigations...",
@@ -60,7 +60,7 @@ public class ChromeDevToolsParserTest {
 
 		ParsedEntry e = entries.getEntry();
 		assertEquals("(id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {\n   \"expression\": \"1\"\n}", e.getMessage());
-		assertEquals("1610104509.861", e.getDate());
+		assertEquals("2021-01-08T11:15:09.861Z", e.getDate());
 		assertEquals("DEBUG", e.getLevel());
 		assertEquals("Runtime.evaluate", e.getEmitter());
 		assertEquals("[1610104509.861][DEBUG]: DevTools WebSocket Command: Runtime.evaluate (id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {\n   \"expression\": \"1\"\n}",
@@ -80,7 +80,7 @@ public class ChromeDevToolsParserTest {
 
 		ParsedEntry e = entries.getEntry();
 		assertEquals("hello world", e.getMessage());
-		assertEquals("1610104509.861", e.getDate());
+		assertEquals("2021-01-08T11:15:09.861Z", e.getDate());
 		assertEquals("DEBUG", e.getLevel());
 		assertEquals("Runtime.consoleAPICalled", e.getEmitter());
 		assertEquals(null, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));

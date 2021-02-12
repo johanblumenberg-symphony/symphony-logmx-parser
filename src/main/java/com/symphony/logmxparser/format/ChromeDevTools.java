@@ -36,7 +36,7 @@ public class ChromeDevTools {
 		Matcher matcher = ENTRY_BEGIN_PATTERN.matcher(entry.getMessage());
 
 		if (matcher.matches()) {
-			Parser.setDate(entry, matcher.group(1), parseDate(matcher.group(1)));
+			Parser.setDate(entry, parseDate(matcher.group(1)));
 			entry.setLevel(matcher.group(2));
 			entry.setMessage(matcher.group(3));
 			String msg = matcher.group(3);

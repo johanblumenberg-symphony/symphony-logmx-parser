@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +52,7 @@ public class Mana {
 		if (matcher1.matches()) {
 			Integer seq = Integer.parseInt(matcher1.group(1));
 			entry.getUserDefinedFields().put(Parser.EXTRA_SEQ_FIELD_KEY, seq);
-			Parser.setDate(entry, matcher1.group(2), parseDate(matcher1.group(2)));
+			Parser.setDate(entry, parseDate(matcher1.group(2)));
 			entry.setLevel(matcher1.group(3));
 			entry.setEmitter(matcher1.group(4));
 			entry.setMessage(matcher1.group(5));
@@ -59,7 +60,7 @@ public class Mana {
 
 			refineStringRepresentation(entry);
 		} else if (matcher2.matches()) {
-			Parser.setDate(entry, matcher2.group(1), parseDate(matcher2.group(1)));
+			Parser.setDate(entry, parseDate(matcher2.group(1)));
 			entry.setLevel(matcher2.group(2));
 			entry.setEmitter(matcher2.group(3));
 			entry.setMessage(matcher2.group(4));
@@ -95,7 +96,8 @@ public class Mana {
 
 	private Date parseDate(String value) throws Exception {
 		if (dateFormat == null) {
-			dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", parser.getParserLocale());
+			dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			dateFormat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
 		}
 		synchronized (dateFormat) {
 			return dateFormat.parse(value);
