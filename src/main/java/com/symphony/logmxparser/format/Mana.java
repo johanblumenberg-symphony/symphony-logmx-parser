@@ -118,6 +118,7 @@ public class Mana {
 				e.setLevel("TRACE");
 				e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
 				e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
+				e.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, jsonMapperShort.writeValueAsString(value.getValue()));
 
 				parser.addParsedEntry(e);
 			}
@@ -130,7 +131,7 @@ public class Mana {
 				e.setLevel("TRACE");
 				e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
 				e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
-
+				e.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, jsonMapperShort.writeValueAsString(value.getValue()));
 				parser.addParsedEntry(e);
 			}
 		}
