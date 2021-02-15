@@ -27,7 +27,8 @@ public class Mana {
 	private final static Pattern CLIENT20_STATS_EMITTER_PATTERN = Pattern.compile("^rtc\\.stats-(\\d+)$");
 	private final static Pattern CLIENT20_STATS_MESSAGE_PATTERN = Pattern.compile("^stats, (.*)$");
 	private final static Pattern CLIENT15_STATS_EMITTER_PATTERN = Pattern.compile("^stats-(\\d+)$");
-	private final static Pattern CLIENT15_STATS_MESSAGE_PATTERN = Pattern.compile("^stats, '\\[object Object\\]': (.*)$");
+	private final static Pattern CLIENT15_STATS_MESSAGE_PATTERN = Pattern
+			.compile("^stats, '\\[object Object\\]': (.*)$");
 
 	private Parser parser;
 	private SimpleDateFormat dateFormat;
@@ -112,30 +113,42 @@ public class Mana {
 
 		System.out.println("Matches " + emitter15.matches() + " " + message15.matches() + " " + entry.getMessage());
 		if (emitter20.matches() && message20.matches()) {
-			Map<String, Object> parsed = jsonMapper.readValue(message20.group(1), Map.class);
+			Map<String, Object> parsed = parseValue(message20.group(1));
 
-			for (Map.Entry<String, Object> value : parsed.entrySet()) {
-				ParsedEntry e = parser.prepareNewEntryFrom(entry);
-				e.setEmitter(entry.getEmitter() + "." + value.getKey());
-				e.setLevel("TRACE");
-				e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
-				e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
-				e.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, jsonMapperShort.writeValueAsString(value.getValue()));
+			if (parsed != null) {
+				for (Map.Entry<String, Object> value : parsed.entrySet()) {
+					ParsedEntry e = parser.prepareNewEntryFrom(entry);
+					e.setEmitter(entry.getEmitter() + "." + value.getKey());
+					e.setLevel("TRACE");
+					e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
+					e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
+					e.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, jsonMapperShort.writeValueAsString(value.getValue()));
 
-				parser.addParsedEntry(e);
+					parser.addParsedEntry(e);
+				}
 			}
 		} else if (emitter15.matches() && message15.matches()) {
-			Map<String, Object> parsed = jsonMapper.readValue(message15.group(1), Map.class);
+			Map<String, Object> parsed = parseValue(message15.group(1));
 
-			for (Map.Entry<String, Object> value : parsed.entrySet()) {
-				ParsedEntry e = parser.prepareNewEntryFrom(entry);
-				e.setEmitter(entry.getEmitter() + "." + value.getKey());
-				e.setLevel("TRACE");
-				e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
-				e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
-				e.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, jsonMapperShort.writeValueAsString(value.getValue()));
-				parser.addParsedEntry(e);
+			if (parsed != null) {
+				for (Map.Entry<String, Object> value : parsed.entrySet()) {
+					ParsedEntry e = parser.prepareNewEntryFrom(entry);
+					e.setEmitter(entry.getEmitter() + "." + value.getKey());
+					e.setLevel("TRACE");
+					e.setMessage(jsonMapperShort.writeValueAsString(value.getValue()));
+					e.getUserDefinedFields().put(Parser.EXTRA_HIDDEN_ORG_FIELD_KEY, jsonMapper.writeValueAsString(value.getValue()));
+					e.getUserDefinedFields().put(Parser.EXTRA_COPY_FIELD_KEY, jsonMapperShort.writeValueAsString(value.getValue()));
+					parser.addParsedEntry(e);
+				}
 			}
+		}
+	}
+
+	private Map<String, Object> parseValue(String value) {
+		try {
+			return jsonMapper.readValue(value, Map.class);
+		} catch (IOException e) {
+			return null;
 		}
 	}
 }

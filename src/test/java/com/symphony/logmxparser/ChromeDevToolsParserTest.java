@@ -123,6 +123,24 @@ public class ChromeDevToolsParserTest {
 	}
 	
 	@Test
+	public void testDevToolsMana20TruncatedStatsLogLog() throws Exception {
+		parser.parseLine("[1610104509.861][DEBUG]: DevTools WebSocket Command: Runtime.consoleAPICalled (id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {");
+		parser.parseLine("   \"args\": [ {");
+		parser.parseLine("      \"type\": \"string\",");
+		parser.parseLine("      \"value\": \"1|2020-11-25T16:35:59.323Z|DEBUG(4)|rtc.stats-4: stats, {\\\"name\\\":{\\\"key1\\\":\\\"value1\\\",\\\"ke...\"");
+		parser.parseLine("   } ]");
+		parser.parseLine("}");
+		parser.parseLine(null);
+
+		ParsedEntry e = entries.getEntry();
+		assertEquals("stats, {\"name\":{\"key1\":\"value1\",\"ke...", e.getMessage());
+		assertEquals("2020-11-25T16:35:59.323Z", e.getDate());
+		assertEquals("DEBUG", e.getLevel());
+		assertEquals("rtc.stats-4", e.getEmitter());
+		assertEquals(1, e.getUserDefinedFields().get(Parser.EXTRA_SEQ_FIELD_KEY));
+	}
+	
+	@Test
 	public void testCopyColumnMana20Log() throws Exception {
 		parser.parseLine("[1610104509.861][DEBUG]: DevTools WebSocket Command: Runtime.consoleAPICalled (id=550) 8BB6563E7B1D68B5CA9DB401D4ED5410 {");
 		parser.parseLine("   \"args\": [ {");
